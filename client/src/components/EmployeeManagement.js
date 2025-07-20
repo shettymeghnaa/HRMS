@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './EmployeeManagement.css';
+import { API_BASE_URL } from '../config';
 
 const EmployeeManagement = ({ user, token }) => {
   const [employees, setEmployees] = useState([]);
@@ -46,7 +47,7 @@ const EmployeeManagement = ({ user, token }) => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('/api/employees', {
+      const response = await fetch(`${API_BASE_URL}/employees`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -65,7 +66,7 @@ const EmployeeManagement = ({ user, token }) => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch('/api/employees/departments/list', {
+      const response = await fetch(`${API_BASE_URL}/employees/departments/list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -84,8 +85,8 @@ const EmployeeManagement = ({ user, token }) => {
     e.preventDefault();
     try {
       const url = editingEmployee 
-        ? `/api/employees/${editingEmployee.id}`
-        : '/api/employees';
+        ? `${API_BASE_URL}/employees/${editingEmployee.id}`
+        : `${API_BASE_URL}/employees`;
       
       const method = editingEmployee ? 'PUT' : 'POST';
       const body = editingEmployee 
@@ -135,7 +136,7 @@ const EmployeeManagement = ({ user, token }) => {
     }
 
     try {
-      const response = await fetch('/api/employees/admin', {
+      const response = await fetch(`${API_BASE_URL}/employees/admin`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -189,7 +190,7 @@ const EmployeeManagement = ({ user, token }) => {
     }
 
     try {
-      const response = await fetch(`/api/employees/${employeeId}`, {
+      const response = await fetch(`${API_BASE_URL}/employees/${employeeId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

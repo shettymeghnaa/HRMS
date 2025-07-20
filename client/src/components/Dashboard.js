@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import LeaveManagement from './LeaveManagement';
 import EmployeeManagement from './EmployeeManagement';
+import { API_BASE_URL } from '../config';
 
 const Dashboard = ({ user, onLogout, token }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -48,21 +49,21 @@ const Dashboard = ({ user, onLogout, token }) => {
       setLoading(true);
       
       // Fetch statistics
-      const statsResponse = await fetch('/api/dashboard/stats', {
+      const statsResponse = await fetch(`${API_BASE_URL}/dashboard/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
       // Fetch recent activity
-      const activityResponse = await fetch('/api/dashboard/activity', {
+      const activityResponse = await fetch(`${API_BASE_URL}/dashboard/activity`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
       // Fetch user-specific data
-      const userDataResponse = await fetch('/api/dashboard/user-data', {
+      const userDataResponse = await fetch(`${API_BASE_URL}/dashboard/user-data`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -99,7 +100,7 @@ const Dashboard = ({ user, onLogout, token }) => {
   // Check attendance status
   const checkAttendanceStatus = async () => {
     try {
-      const response = await fetch('/api/attendance/status', {
+      const response = await fetch(`${API_BASE_URL}/attendance/status`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -120,7 +121,7 @@ const Dashboard = ({ user, onLogout, token }) => {
   // Check in/out
   const handleAttendance = async (action) => {
     try {
-      const response = await fetch('/api/attendance/check', {
+      const response = await fetch(`${API_BASE_URL}/attendance/check`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -499,7 +500,7 @@ const PerformanceTab = ({ user, data, token }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/performance/${user.id}`, {
+      const response = await fetch(`${API_BASE_URL}/performance/${user.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -523,7 +524,7 @@ const PerformanceTab = ({ user, data, token }) => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('/api/performance/employees/list', {
+      const response = await fetch(`${API_BASE_URL}/performance/employees/list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -553,7 +554,7 @@ const PerformanceTab = ({ user, data, token }) => {
     setError(null);
     setSuccess(null);
     try {
-      const response = await fetch(`/api/performance/${selectedEmployee}`, {
+      const response = await fetch(`${API_BASE_URL}/performance/${selectedEmployee}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -679,7 +680,7 @@ const ReportsTab = ({ user, token }) => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch('/api/employees/departments/list', {
+      const response = await fetch(`${API_BASE_URL}/employees/departments/list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -704,7 +705,7 @@ const ReportsTab = ({ user, token }) => {
       if (filters.departmentId) queryParams.append('departmentId', filters.departmentId);
       if (filters.status) queryParams.append('status', filters.status);
 
-      const response = await fetch(`/api/reports/${activeReport}?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/reports/${activeReport}?${queryParams}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

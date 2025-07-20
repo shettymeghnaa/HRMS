@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Auth.css';
+import { API_BASE_URL } from '../config';
 
 const Register = ({ onRegister, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +29,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
       setDepartmentsLoading(true);
       setDepartmentsError(null);
       console.log('Fetching departments...');
-      const response = await fetch('/api/employees/departments');
+      const response = await fetch(`${API_BASE_URL}/employees/departments`);
       console.log('Departments response status:', response.status);
       
       if (response.ok) {
@@ -128,7 +129,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
     try {
       const { confirmPassword, ...registerData } = formData;
       
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

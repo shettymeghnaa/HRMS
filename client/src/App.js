@@ -3,6 +3,7 @@ import './App.css';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import { API_BASE_URL } from './config';
 
 function App() {
   const [backendStatus, setBackendStatus] = useState('Loading...');
@@ -21,7 +22,7 @@ function App() {
     
     if (savedToken && savedUser) {
       // Validate token by making a test API call
-      fetch('/api/auth/validate', {
+      fetch(`${API_BASE_URL}/auth/validate`, {
         headers: {
           'Authorization': `Bearer ${savedToken}`
         }
@@ -48,7 +49,7 @@ function App() {
     }
 
     // Test backend connection
-    fetch('/api/test')
+    fetch(`${API_BASE_URL}/test`)
       .then(response => response.json())
       .then(data => {
         setTestData(data);
@@ -60,7 +61,7 @@ function App() {
       });
 
     // Test health endpoint (includes database status)
-    fetch('/api/health')
+    fetch(`${API_BASE_URL}/health`)
       .then(response => response.json())
       .then(data => {
         setHealthData(data);
