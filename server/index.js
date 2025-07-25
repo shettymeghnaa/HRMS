@@ -3,7 +3,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
-
 // Import database configuration
 const { testConnection, initDatabase } = require('./config/database');
 
@@ -148,6 +147,7 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, async () => {
+  await initDatabase();
   console.log(`🚀 HRMS Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🧪 Test endpoint: http://localhost:${PORT}/api/test`);
