@@ -15,7 +15,7 @@ const LeaveManagement = ({ user, token }) => {
 
   useEffect(() => {
     fetchLeaves();
-  }, []);
+  }, );
 
   const fetchLeaves = async () => {
     try {

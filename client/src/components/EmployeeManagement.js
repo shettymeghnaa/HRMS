@@ -43,7 +43,7 @@ const EmployeeManagement = ({ user, token }) => {
   useEffect(() => {
     fetchEmployees();
     fetchDepartments();
-  }, []);
+  },);
 
   const fetchEmployees = async () => {
     try {

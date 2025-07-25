@@ -676,7 +676,7 @@ const ReportsTab = ({ user, token }) => {
   useEffect(() => {
     fetchDepartments();
     fetchReportData();
-  }, [activeReport, filters]);
+  }, );
 
   const fetchDepartments = useCallback(async () => {
   try {
