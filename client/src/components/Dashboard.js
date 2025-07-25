@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Dashboard.css';
 import LeaveManagement from './LeaveManagement';
 import EmployeeManagement from './EmployeeManagement';
@@ -34,17 +34,17 @@ const Dashboard = ({ user, onLogout, token }) => {
   const [error, setError] = useState(null);
 
   // Helper function to handle API responses
-  const handleApiResponse = async (response) => {
+  const handleApiResponse = useCallback(async (response) => {
     if (response.status === 401) {
       // Token is invalid, logout user
       onLogout();
       return null;
     }
     return response.json();
-  };
+  }, [onLogout]);
 
   // Fetch dashboard data
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -74,7 +74,7 @@ const Dashboard = ({ user, onLogout, token }) => {
       const userData = await handleApiResponse(userDataResponse);
 
       if (stats && activity && userData) {
-        setDashboardData({
+        setDashboardData(prevDashboardData => ({
           stats: {
             totalEmployees: stats.data?.totalEmployees || 0,
             presentToday: stats.data?.presentToday || 0,
@@ -82,12 +82,12 @@ const Dashboard = ({ user, onLogout, token }) => {
             payrollDue: stats.data?.totalSalary || 0,
             newEmployeesThisMonth: stats.data?.newEmployeesThisMonth || 0
           },
-          recentActivity: activity.data || dashboardData.recentActivity,
-          attendanceStatus: userData.data?.attendanceStatus || dashboardData.attendanceStatus,
-          leaveBalance: userData.data?.leaveBalance || dashboardData.leaveBalance,
-          salary: userData.data?.salary || dashboardData.salary,
-          performance: userData.data?.performance || dashboardData.performance
-        });
+          recentActivity: activity.data || prevDashboardData.recentActivity,
+          attendanceStatus: userData.data?.attendanceStatus || prevDashboardData.attendanceStatus,
+          leaveBalance: userData.data?.leaveBalance || prevDashboardData.leaveBalance,
+          salary: userData.data?.salary || prevDashboardData.salary,
+          performance: userData.data?.performance || prevDashboardData.performance
+        }));
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -95,10 +95,10 @@ const Dashboard = ({ user, onLogout, token }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, handleApiResponse]);
 
   // Check attendance status
-  const checkAttendanceStatus = async () => {
+  const checkAttendanceStatus = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/attendance/status`, {
         headers: {
@@ -116,7 +116,7 @@ const Dashboard = ({ user, onLogout, token }) => {
     } catch (error) {
       console.error('Error checking attendance status:', error);
     }
-  };
+  }, [token]);
 
   // Check in/out
   const handleAttendance = async (action) => {
@@ -154,7 +154,7 @@ const Dashboard = ({ user, onLogout, token }) => {
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchDashboardData, checkAttendanceStatus]);
 
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: '📊' },
@@ -678,49 +678,50 @@ const ReportsTab = ({ user, token }) => {
     fetchReportData();
   }, [activeReport, filters]);
 
-  const fetchDepartments = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/employees/departments/list`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      const result = await handleApiResponse(response);
-      if (result && result.success) {
-        setDepartments(result.data);
+  const fetchDepartments = useCallback(async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/employees/departments/list`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-    } catch (error) {
-      console.error('Error fetching departments:', error);
+    });
+    const result = await handleApiResponse(response);
+    if (result && result.success) {
+      setDepartments(result.data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
+}, [token]);
 
-  const fetchReportData = async () => {
-    setLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      
-      if (filters.startDate) queryParams.append('startDate', filters.startDate);
-      if (filters.endDate) queryParams.append('endDate', filters.endDate);
-      if (filters.departmentId) queryParams.append('departmentId', filters.departmentId);
-      if (filters.status) queryParams.append('status', filters.status);
 
-      const response = await fetch(`${API_BASE_URL}/reports/${activeReport}?${queryParams}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      const result = await handleApiResponse(response);
-      if (result && result.success) {
-        setReportData(result.data);
+  const fetchReportData = useCallback(async () => {
+  setLoading(true);
+  try {
+    const queryParams = new URLSearchParams();
+    if (filters.startDate) queryParams.append('startDate', filters.startDate);
+    if (filters.endDate) queryParams.append('endDate', filters.endDate);
+    if (filters.departmentId) queryParams.append('departmentId', filters.departmentId);
+    if (filters.status) queryParams.append('status', filters.status);
+
+    const response = await fetch(`${API_BASE_URL}/reports/${activeReport}?${queryParams}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-    } catch (error) {
-      console.error('Error fetching report data:', error);
-    } finally {
-      setLoading(false);
+    });
+    const result = await handleApiResponse(response);
+    if (result && result.success) {
+      setReportData(result.data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching report data:', error);
+  } finally {
+    setLoading(false);
+  }
+}, [activeReport, filters, token]);
+
 
   const renderReportContent = () => {
     if (loading) {

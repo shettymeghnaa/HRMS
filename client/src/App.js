@@ -6,10 +6,7 @@ import Dashboard from './components/Dashboard';
 import { API_BASE_URL } from './config';
 
 function App() {
-  const [backendStatus, setBackendStatus] = useState('Loading...');
-  const [databaseStatus, setDatabaseStatus] = useState('Loading...');
-  const [testData, setTestData] = useState(null);
-  const [healthData, setHealthData] = useState(null);
+  // Removed unused healthData state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -49,28 +46,13 @@ function App() {
     }
 
     // Test backend connection
+    // Test backend connection
     fetch(`${API_BASE_URL}/test`)
       .then(response => response.json())
-      .then(data => {
-        setTestData(data);
-        setBackendStatus('Connected ✅');
-      })
       .catch(error => {
         console.error('Backend connection failed:', error);
-        setBackendStatus('Failed ❌');
       });
-
-    // Test health endpoint (includes database status)
-    fetch(`${API_BASE_URL}/health`)
-      .then(response => response.json())
-      .then(data => {
-        setHealthData(data);
-        setDatabaseStatus(data.database === 'connected' ? 'Connected ✅' : 'Disconnected ❌');
-      })
-      .catch(error => {
-        console.error('Health check failed:', error);
-        setDatabaseStatus('Failed ❌');
-      });
+    // Removed unused health check fetch
   }, []);
 
   const handleLogin = (userData, userToken) => {
@@ -109,7 +91,7 @@ function App() {
     return () => {
       window.fetch = originalFetch;
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated]); // Only depends on isAuthenticated
 
   // Show authentication forms if not authenticated
   if (!isAuthenticated) {
@@ -137,5 +119,4 @@ function App() {
     </div>
   );
 }
-
-export default App; 
+export default App;
